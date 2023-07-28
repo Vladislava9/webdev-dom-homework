@@ -9,40 +9,7 @@
   <body>
     <div class="container">
       <ul class="comments" id="commentsId">
-        <li class="comment">
-          <div class="comment-header">
-            <div>Глеб Фокин</div>
-            <div>12.02.22 12:18</div>
-          </div>
-          <div class="comment-body">
-            <div class="comment-text">
-              Это будет первый комментарий на этой странице
-            </div>
-          </div>
-          <div class="comment-footer">
-            <div class="likes">
-              <span class="likes-counter">3</span>
-              <button class="like-button"></button>
-            </div>
-          </div>
-        </li>
-        <li class="comment">
-          <div class="comment-header">
-            <div>Варвара Н.</div>
-            <div>13.02.22 19:22</div>
-          </div>
-          <div class="comment-body">
-            <div class="comment-text">
-              Мне нравится как оформлена эта страница! ❤
-            </div>
-          </div>
-          <div class="comment-footer">
-            <div class="likes">
-              <span class="likes-counter">75</span>
-              <button class="like-button -active-like"></button>
-            </div>
-          </div>
-        </li>
+        <!--Список рендерится из js -->
       </ul>
       <div class="add-form">
         <input
@@ -66,9 +33,168 @@
       </div>
     </div>
   </body>
+  <style>
+    .error{
+      background-color: brown;
+    }
+
+    .quote {
+      margin-bottom: 32px;
+      padding: 15px 20px;
+      white-space: pre-line;
+      background: #d5d2d2;
+      font-size: 16px;
+      color: #000000;
+      border-radius: 5px;
+    }
+  </style>
   <script>
     "use strict";
-     
+    const buttonElement = document.getElementById("add-form-buttonId");
+    const listElement = document.getElementById("commentsId");
+    const nameInputElement = document.getElementById("name-input");
+    const textInputElement = document.getElementById("text-input");
+
+    let isReplay = false;
+
+    let newDate = new Date;
+    let time = {
+      hour: "numeric",
+      minute: "numeric"
+    };
+    let date = {
+      year: "2-digit",
+      month: "numeric",
+      day: "numeric"
+    };
+
+    let nowDate = newDate.toLocaleString("ru", date) + " " + newDate.toLocaleString("ru", time);
+    const userElements = document.querySelectorAll(".comment");
+
+    const users = [
+      {
+        name: "Глеб Фокин",
+        dateCom: "12.02.22 12:18",
+        text: "Это будет первый комментарий на этой странице",
+        likesQuantity: 3,
+        isLiked: false
+      },
+      {
+        name: "Варвара Н.",
+        dateCom: "13.02.22 19:22",
+        text: "Мне нравится как оформлена эта страница! ❤",
+        likesQuantity: 75,
+        isLiked: true
+      }
+    ];
+    
+    const renderUsers = () => {
+      const usersHtml = users.map((user) => {
+        return `<li class="comment">
+          <div class="comment-header">
+            <div>${user.name}</div>
+            <div>${user.dateCom}</div>
+          </div>
+          <div class="comment-body">
+            <div class="comment-text">
+              ${user.text}
+            </div>
+          </div>
+          <div class="comment-footer">
+            <div class="likes">
+              <span class="likes-counter">${user.likesQuantity}</span>
+              <button class="${getLikeClass(user.isLiked)}"></button>
+            </div>
+          </div>
+        </li>`
+      }).join("");
+      
+      listElement.innerHTML = usersHtml;
+      addLike();
+      newReply();
+    };
+
+    const addComment = () => {
+      const textInputValue = isReplay ? `QUOTE_BEGIN${textInputElement.value}QUOTE_END` : textInputElement.value;
+      
+      if(nameInputElement.value === ''){
+        nameInputElement.classList.add('error');
+        return;
+      } else if(textInputElement.value === '') {
+          textInputElement.classList.add('error');
+          return;
+      } else {
+        users.push({
+        name: replaceValue(nameInputElement.value),
+        dateCom: nowDate,
+        text: replaceValue(textInputValue)
+        .replaceAll('QUOTE_BEGIN', '<div class="quote">')
+        .replaceAll('QUOTE_END', '</div>'),
+        likesQuantity: 0,
+        isLiked: false
+      })
+      }
+    
+      renderUsers();
+      
+      nameInputElement.value = "";
+      textInputElement.value = "";
+      nameInputElement.classList.remove('error');
+      textInputElement.classList.remove('error');
+      isReplay = false;
+    };
+    
+    const getLikeClass = (element) => {
+        return element ? "like-button -active-like" : "like-button";
+      }
+
+    function addLike() {
+      const likeElements = document.querySelectorAll(".like-button");
+      
+      likeElements.forEach((likeElement, index) => {
+        
+        likeElement.addEventListener("click", (event) => {
+          event.stopPropagation();
+          const user = users[index];
+          if(user.isLiked === true) {
+            user.isLiked = false;
+            user.likesQuantity -= 1;
+            renderUsers();
+          } else{
+            user.isLiked = true;
+            user.likesQuantity += 1;
+            renderUsers();
+          }; 
+        });
+      });
+    };
+    
+    const newReply = () => {
+      const commentElements = document.querySelectorAll('.comment');
+
+      commentElements.forEach((commentElement, index) => {
+        commentElement.addEventListener('click', (event) => {
+          event.stopPropagation();
+          const originalText = `${users[index].name} : ${users[index].text
+          .replaceAll('<div class="quote">', '')
+          .replaceAll('</div', '')}`;
+          textInputElement.value = originalText;
+          isReplay = true;
+        })
+      });
+    };
+    
+    const replaceValue = (value) => {
+      return value
+      .replaceAll('&', '&amp;')
+      .replaceAll('<', '&lt;')
+      .replaceAll('>', '&gt;')
+      .replaceAll('"', '&quot;');
+    }
+    
+    renderUsers();
+    buttonElement.addEventListener('click', addComment)
+      
     console.log("It works!");
   </script>
 </html>
