@@ -98,7 +98,7 @@ body {
     flex-direction: column;
   }
 
-  .add-form-name,
+  .add-form-author,
   .add-form-text {
     font-size: 16px;
     font-family: Helvetica;
@@ -106,7 +106,7 @@ body {
     border: none;
   }
 
-  .add-form-name {
+  .add-form-author {
     width: 300px;
     padding: 11px 22px;
   }

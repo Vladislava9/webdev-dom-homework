@@ -1,99 +1,123 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <title>Проект "Комменты"</title>
-    <meta charset="utf-8" />
-    <link rel="stylesheet" href="styles.css" />
-  </head>
 
-  <body>
-    <div class="container">
-      <ul class="comments" id="commentsId">
-        <!--Список рендерится из js -->
-      </ul>
-      <div class="add-form">
-        <input
-          type="text"
-          class="add-form-name"
-          id="name-input"
-          value=""
-          placeholder="Введите ваше имя"
-        />
-        <textarea
-          type="textarea"
-          class="add-form-text"
-          id="text-input"
-          value=""
-          placeholder="Введите ваш коментарий"
-          rows="4"
-        ></textarea>
-        <div class="add-form-row">
-          <button class="add-form-button" id="add-form-buttonId">Написать</button>
-        </div>
+<head>
+  <title>Проект "Комменты"</title>
+  <meta charset="utf-8" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+
+<body>
+  <div class="container">
+    <ul class="comments" id="commentsId">
+      <!--Список рендерится из js -->
+    </ul>
+    <div class="add-form">
+      <input type="text" class="add-form-author" id="author-input" value="" placeholder="Введите ваше имя" />
+      <textarea type="textarea" class="add-form-text" id="text-input" value="" placeholder="Введите ваш коментарий"
+        rows="4"></textarea>
+      <div class="add-form-row">
+        <button class="add-form-button" id="add-form-buttonId">Написать</button>
       </div>
     </div>
-  </body>
-  <style>
-    .error{
-      background-color: brown;
-    }
+  </div>
+</body>
+<style>
+  .error {
+    background-color: brown;
+  }
 
-    .quote {
-      margin-bottom: 32px;
-      padding: 15px 20px;
-      white-space: pre-line;
-      background: #d5d2d2;
-      font-size: 16px;
-      color: #000000;
-      border-radius: 5px;
-    }
-  </style>
-  <script>
-    "use strict";
-    const buttonElement = document.getElementById("add-form-buttonId");
-    const listElement = document.getElementById("commentsId");
-    const nameInputElement = document.getElementById("name-input");
-    const textInputElement = document.getElementById("text-input");
+  .quote {
+    margin-bottom: 32px;
+    padding: 15px 20px;
+    white-space: pre-line;
+    background: #d5d2d2;
+    font-size: 16px;
+    color: #000000;
+    border-radius: 5px;
+  }
+</style>
+<script>
+  "use strict";
+  const buttonElement = document.getElementById("add-form-buttonId");
+  const listElement = document.getElementById("commentsId");
+  const authorInputElement = document.getElementById("author-input");
+  const textInputElement = document.getElementById("text-input");
+  const userElements = document.querySelectorAll(".comment");
 
-    let isReplay = false;
+  let isReplay = false;
 
-    let newDate = new Date;
-    let time = {
-      hour: "numeric",
-      minute: "numeric"
-    };
-    let date = {
-      year: "2-digit",
-      month: "numeric",
-      day: "numeric"
-    };
+  const addDate = (date) => {
+  const newDate = new Date(date);
+  let time = {
+    hour: "numeric",
+    minute: "numeric"
+  };
+  let year = {
+    year: "2-digit",
+    month: "numeric",
+    day: "numeric"
+  };
 
-    let nowDate = newDate.toLocaleString("ru", date) + " " + newDate.toLocaleString("ru", time);
-    const userElements = document.querySelectorAll(".comment");
+  return newDate.toLocaleString("ru", year) + " " + newDate.toLocaleString("ru", time);
+  
+};
 
-    const users = [
+  const getApi = () => {
+    const fetchPromiseGet = fetch("https://wedev-api.sky.pro/api/v1/vlada-pokolyavina/comments",
       {
-        name: "Глеб Фокин",
-        dateCom: "12.02.22 12:18",
-        text: "Это будет первый комментарий на этой странице",
-        likesQuantity: 3,
-        isLiked: false
-      },
+        method: "GET",
+      }).then((response) => {
+        return response.json();
+      })
+      .then((responseData) => {
+        users = responseData.comments;
+        renderUsers();
+      })
+    return fetchPromiseGet;
+  }
+  getApi();
+
+  const postApi = () => {
+    const fetchPromisePost = fetch("https://wedev-api.sky.pro/api/v1/vlada-pokolyavina/comments",
       {
-        name: "Варвара Н.",
-        dateCom: "13.02.22 19:22",
-        text: "Мне нравится как оформлена эта страница! ❤",
-        likesQuantity: 75,
-        isLiked: true
-      }
-    ];
-    
-    const renderUsers = () => {
-      const usersHtml = users.map((user) => {
-        return `<li class="comment">
+        method: "POST",
+        body: JSON.stringify({
+          text: textInputElement.value,
+          name: authorInputElement.value
+        })
+      }).then(() => {
+        getApi()
+      })
+
+    return fetchPromisePost;
+  }
+  
+
+  let users = [];
+ 
+  //   {
+  //     author: "Глеб Фокин",
+  //     date: "12.02.22 12:18",
+  //     text: "Это будет первый комментарий на этой странице",
+  //     likes: 3,
+  //     isLiked: false
+  //   },
+  //   {
+  //     author: "Варвара Н.",
+  //     date: "13.02.22 19:22",
+  //     text: "Мне нравится как оформлена эта страница! ❤",
+  //     likes: 75,
+  //     isLiked: true
+  //   }
+  // ];
+
+  const renderUsers = () => {
+    const usersHtml = users.map((user) => {
+      return `<li class="comment">
           <div class="comment-header">
-            <div>${user.name}</div>
-            <div>${user.dateCom}</div>
+            <div>${user.author.name}</div>
+            <div>${addDate((user.date))}</div>
           </div>
           <div class="comment-body">
             <div class="comment-text">
@@ -102,99 +126,104 @@
           </div>
           <div class="comment-footer">
             <div class="likes">
-              <span class="likes-counter">${user.likesQuantity}</span>
+              <span class="likes-counter">${user.likes}</span>
               <button class="${getLikeClass(user.isLiked)}"></button>
             </div>
           </div>
         </li>`
-      }).join("");
-      
-      listElement.innerHTML = usersHtml;
-      addLike();
-      newReply();
-    };
+    }).join("");
 
-    const addComment = () => {
-      const textInputValue = isReplay ? `QUOTE_BEGIN${textInputElement.value}QUOTE_END` : textInputElement.value;
-      
-      if(nameInputElement.value === ''){
-        nameInputElement.classList.add('error');
-        return;
-      } else if(textInputElement.value === '') {
-          textInputElement.classList.add('error');
-          return;
-      } else {
-        users.push({
-        name: replaceValue(nameInputElement.value),
-        dateCom: nowDate,
-        text: replaceValue(textInputValue)
-        .replaceAll('QUOTE_BEGIN', '<div class="quote">')
-        .replaceAll('QUOTE_END', '</div>'),
-        likesQuantity: 0,
-        isLiked: false
-      })
-      }
-    
-      renderUsers();
-      
-      nameInputElement.value = "";
-      textInputElement.value = "";
-      nameInputElement.classList.remove('error');
-      textInputElement.classList.remove('error');
-      isReplay = false;
-    };
-    
-    const getLikeClass = (element) => {
-        return element ? "like-button -active-like" : "like-button";
-      }
+    listElement.innerHTML = usersHtml;
+    addLike();
+    newReply();
+  };
+  function ClickButtonEvent() {
+    buttonElement.addEventListener('click', addComment);
+  }
+  const addComment = () => {
+    const textInputValue = isReplay ? `QUOTE_BEGIN${textInputElement.value}QUOTE_END` : textInputElement.value;
 
-    function addLike() {
-      const likeElements = document.querySelectorAll(".like-button");
-      
-      likeElements.forEach((likeElement, index) => {
-        
-        likeElement.addEventListener("click", (event) => {
-          event.stopPropagation();
-          const user = users[index];
-          if(user.isLiked === true) {
-            user.isLiked = false;
-            user.likesQuantity -= 1;
-            renderUsers();
-          } else{
-            user.isLiked = true;
-            user.likesQuantity += 1;
-            renderUsers();
-          }; 
-        });
+    if (authorInputElement.value === '') {
+      authorInputElement.classList.add('error');
+      return;
+    } else if (textInputElement.value === '') {
+      textInputElement.classList.add('error');
+      return;
+    } else {
+      // users.push({
+      //   author: replaceValue(authorInputElement.value),
+      //   date: nowDate,
+      //   text: replaceValue(textInputValue)
+      //     .replaceAll('QUOTE_BEGIN', '<div class="quote">')
+      //     .replaceAll('QUOTE_END', '</div>'),
+      //   likes: 0,
+      //   isLiked: false
+      // })
+      postApi();
+    }
+
+    renderUsers();
+
+    authorInputElement.value = "";
+    textInputElement.value = "";
+    authorInputElement.classList.remove('error');
+    textInputElement.classList.remove('error');
+    isReplay = false;
+  };
+
+  const getLikeClass = (element) => {
+    return element ? "like-button -active-like" : "like-button";
+  }
+
+  function addLike() {
+    const likeElements = document.querySelectorAll(".like-button");
+
+    likeElements.forEach((likeElement, index) => {
+
+      likeElement.addEventListener("click", (event) => {
+        event.stopPropagation();
+        const user = users[index];
+        if (user.isLiked === true) {
+          user.isLiked = false;
+          user.likes -= 1;
+          renderUsers();
+        } else {
+          user.isLiked = true;
+          user.likes += 1;
+          renderUsers();
+        };
       });
-    };
-    
-    const newReply = () => {
-      const commentElements = document.querySelectorAll('.comment');
+    });
+  };
 
-      commentElements.forEach((commentElement, index) => {
-        commentElement.addEventListener('click', (event) => {
-          event.stopPropagation();
-          const originalText = `${users[index].name} : ${users[index].text
+  const newReply = () => {
+    const commentElements = document.querySelectorAll('.comment');
+
+    commentElements.forEach((commentElement, index) => {
+      commentElement.addEventListener('click', (event) => {
+        event.stopPropagation();
+        const originalText = `${users[index].author.name} : ${users[index].text
           .replaceAll('<div class="quote">', '')
           .replaceAll('</div', '')}`;
-          textInputElement.value = originalText;
-          isReplay = true;
-        })
-      });
-    };
-    
-    const replaceValue = (value) => {
-      return value
+        textInputElement.value = originalText;
+        isReplay = true;
+      })
+    });
+  };
+
+  const replaceValue = (value) => {
+    return value
       .replaceAll('&', '&amp;')
       .replaceAll('<', '&lt;')
       .replaceAll('>', '&gt;')
       .replaceAll('"', '&quot;');
-    }
-    
-    renderUsers();
-    buttonElement.addEventListener('click', addComment)
-      
-    console.log("It works!");
-  </script>
+  }
+
+  renderUsers();
+
+  ClickButtonEvent();
+
+  console.log("It works!");
+</script>
+
 </html>
