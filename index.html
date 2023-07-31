@@ -13,12 +13,7 @@
       <!--Список рендерится из js -->
     </ul>
     <div class="add-form">
-      <input type="text" class="add-form-author" id="author-input" value="" placeholder="Введите ваше имя" />
-      <textarea type="textarea" class="add-form-text" id="text-input" value="" placeholder="Введите ваш коментарий"
-        rows="4"></textarea>
-      <div class="add-form-row">
-        <button class="add-form-button" id="add-form-buttonId">Написать</button>
-      </div>
+      
     </div>
   </div>
 </body>
@@ -44,6 +39,14 @@
   const authorInputElement = document.getElementById("author-input");
   const textInputElement = document.getElementById("text-input");
   const userElements = document.querySelectorAll(".comment");
+  const formElement = document.querySelector(".add-form");
+  const formHtml = 
+    `<input type="text" class="add-form-author" id="author-input" value="" placeholder="Введите ваше имя" />
+    <textarea type="textarea" class="add-form-text" id="text-input" value="" placeholder="Введите ваш коментарий"
+      rows="4"></textarea>
+    <div class="add-form-row">
+      <button class="add-form-button" id="add-form-buttonId">Написать</button>
+    </div>`;
 
   let isReplay = false;
 
@@ -63,38 +66,51 @@
   
 };
 
+  let users = [];
+
+  formElement.innerHTML = 'Подождите, комментарии загружаются...';
+  
   const getApi = () => {
-    const fetchPromiseGet = fetch("https://wedev-api.sky.pro/api/v1/vlada-pokolyavina/comments",
+    const formElement = document.querySelector(".add-form");
+    
+    return fetch("https://wedev-api.sky.pro/api/v1/vlada-pokolyavina/comments",
       {
         method: "GET",
-      }).then((response) => {
+      })
+      .then((response) => {
         return response.json();
       })
       .then((responseData) => {
         users = responseData.comments;
+        formElement.innerHTML = formHtml;
         renderUsers();
+        addComment();
       })
-    return fetchPromiseGet;
-  }
-  getApi();
+  };
+  
 
   const postApi = () => {
-    const fetchPromisePost = fetch("https://wedev-api.sky.pro/api/v1/vlada-pokolyavina/comments",
+    
+    const formElement = document.querySelector(".add-form");
+    const authorInputElement = document.getElementById("author-input");
+    const textInputElement = document.getElementById("text-input");
+    formElement.innerHTML = 'Комментарий загружается...';
+    
+    return fetch("https://wedev-api.sky.pro/api/v1/vlada-pokolyavina/comments",
       {
         method: "POST",
         body: JSON.stringify({
           text: textInputElement.value,
           name: authorInputElement.value
         })
-      }).then(() => {
-        getApi()
       })
-
-    return fetchPromisePost;
-  }
+      .then((response) => {
+        getApi();
+  })
+};
   
 
-  let users = [];
+  
  
   //   {
   //     author: "Глеб Фокин",
@@ -137,12 +153,16 @@
     addLike();
     newReply();
   };
-  function ClickButtonEvent() {
-    buttonElement.addEventListener('click', addComment);
-  }
+  
   const addComment = () => {
+    const buttonElement = document.getElementById("add-form-buttonId");
+    const authorInputElement = document.getElementById("author-input");
+    const textInputElement = document.getElementById("text-input");
+    
     const textInputValue = isReplay ? `QUOTE_BEGIN${textInputElement.value}QUOTE_END` : textInputElement.value;
-
+    authorInputElement.classList.remove('error');
+    textInputElement.classList.remove('error');
+    buttonElement.addEventListener("click", () => {
     if (authorInputElement.value === '') {
       authorInputElement.classList.add('error');
       return;
@@ -166,9 +186,9 @@
 
     authorInputElement.value = "";
     textInputElement.value = "";
-    authorInputElement.classList.remove('error');
-    textInputElement.classList.remove('error');
+    
     isReplay = false;
+  })
   };
 
   const getLikeClass = (element) => {
@@ -197,6 +217,7 @@
   };
 
   const newReply = () => {
+    const textInputElement = document.getElementById("text-input");
     const commentElements = document.querySelectorAll('.comment');
 
     commentElements.forEach((commentElement, index) => {
@@ -219,9 +240,10 @@
       .replaceAll('"', '&quot;');
   }
 
+  getApi();
   renderUsers();
 
-  ClickButtonEvent();
+
 
   console.log("It works!");
 </script>
