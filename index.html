@@ -64,7 +64,7 @@
 
   return newDate.toLocaleString("ru", year) + " " + newDate.toLocaleString("ru", time);
   
-};
+  };
 
   let users = [];
 
@@ -87,7 +87,6 @@
         addComment();
       })
   };
-  
 
   const postApi = () => {
     
@@ -108,25 +107,6 @@
         getApi();
   })
 };
-  
-
-  
- 
-  //   {
-  //     author: "Глеб Фокин",
-  //     date: "12.02.22 12:18",
-  //     text: "Это будет первый комментарий на этой странице",
-  //     likes: 3,
-  //     isLiked: false
-  //   },
-  //   {
-  //     author: "Варвара Н.",
-  //     date: "13.02.22 19:22",
-  //     text: "Мне нравится как оформлена эта страница! ❤",
-  //     likes: 75,
-  //     isLiked: true
-  //   }
-  // ];
 
   const renderUsers = () => {
     const usersHtml = users.map((user) => {
@@ -160,6 +140,7 @@
     const textInputElement = document.getElementById("text-input");
     
     const textInputValue = isReplay ? `QUOTE_BEGIN${textInputElement.value}QUOTE_END` : textInputElement.value;
+
     authorInputElement.classList.remove('error');
     textInputElement.classList.remove('error');
     buttonElement.addEventListener("click", () => {
@@ -239,10 +220,7 @@
   }
 
   getApi();
-  renderUsers();
-
-
-
+ 
   console.log("It works!");
 </script>
 
