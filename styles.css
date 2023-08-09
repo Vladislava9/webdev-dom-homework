@@ -135,3 +135,16 @@ body {
   .add-form-button:hover {
     opacity: 0.9;
   }
+
+  .loader_1 {
+    font-size: 16px;
+  }
+
+  .loader_2 {
+    margin-top: 24px;
+    font-size: 16px;
+  }
+
+  .hidden {
+    visibility: hidden;
+  }
