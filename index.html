@@ -9,11 +9,20 @@
 
 <body>
   <div class="container">
+    <div class="loader_1">
+      Подождите, комментарии загружаются...
+    </div>
     <ul class="comments" id="commentsId">
       <!--Список рендерится из js -->
     </ul>
+    <div class="loader_2 hidden">Комментарий загружается...</div>
     <div class="add-form">
-      
+      <input type="text" class="add-form-author" id="author-input" value="" placeholder="Введите ваше имя" />
+    <textarea type="textarea" class="add-form-text" id="text-input" value="" placeholder="Введите ваш коментарий"
+      rows="4"></textarea>
+    <div class="add-form-row">
+      <button class="add-form-button" id="add-form-buttonId">Написать</button>
+    </div>
     </div>
   </div>
 </body>
@@ -40,13 +49,17 @@
   const textInputElement = document.getElementById("text-input");
   const userElements = document.querySelectorAll(".comment");
   const formElement = document.querySelector(".add-form");
-  const formHtml = 
-    `<input type="text" class="add-form-author" id="author-input" value="" placeholder="Введите ваше имя" />
-    <textarea type="textarea" class="add-form-text" id="text-input" value="" placeholder="Введите ваш коментарий"
-      rows="4"></textarea>
-    <div class="add-form-row">
-      <button class="add-form-button" id="add-form-buttonId">Написать</button>
-    </div>`;
+  
+  const getCommentsLoader = document.querySelector(".loader_1");
+  const addCommentLoader = document.querySelector(".loader_2");
+
+  const showElement = (element) => {
+  element.classList.remove("hidden")
+}
+
+  const hideElement = (element) => {
+  element.classList.add("hidden")
+}
 
   let isReplay = false;
 
@@ -68,44 +81,80 @@
 
   let users = [];
 
-  formElement.innerHTML = 'Подождите, комментарии загружаются...';
-  
-  const getApi = () => {
-    const formElement = document.querySelector(".add-form");
+  // formElement.innerHTML = 'Подождите, комментарии загружаются...';
+  hideElement(formElement);
     
-    return fetch("https://wedev-api.sky.pro/api/v1/vlada-pokolyavina/comments",
+  const getApi = () => {
+    // const formElement = document.querySelector(".add-form");
+    
+    showElement(getCommentsLoader);
+    
+    return fetch("https://wedev-api.sky.pro/api/v1/vlada-pokolavina/comments",
       {
         method: "GET",
+        
       })
       .then((response) => {
-        return response.json();
+        if (response.status != 200) {
+        throw new Error("error");
+        } else return response.json();
       })
       .then((responseData) => {
         users = responseData.comments;
-        formElement.innerHTML = formHtml;
+        // formElement.innerHTML = formHtml;
+        hideElement(getCommentsLoader);
+        showElement(formElement);
         renderUsers();
         addComment();
+        return;
       })
-  };
+    };
 
-  const postApi = () => {
+    const postApi = () => {
     
     const formElement = document.querySelector(".add-form");
     const authorInputElement = document.getElementById("author-input");
     const textInputElement = document.getElementById("text-input");
-    formElement.innerHTML = 'Комментарий загружается...';
+    // formElement.innerHTML = 'Комментарий загружается...';
+    showElement(addCommentLoader);
+    hideElement(formElement);
     
-    return fetch("https://wedev-api.sky.pro/api/v1/vlada-pokolyavina/comments",
+    return fetch("https://wedev-api.sky.pro/api/v1/vlada-pokolavina/comments",
       {
         method: "POST",
         body: JSON.stringify({
           text: textInputElement.value,
-          name: authorInputElement.value
+          name: authorInputElement.value,
+          forceError: true
         })
       })
       .then((response) => {
+        if (response.status === 400) {
+          throw new Error("< 2 sumb");
+        } else if (response.status === 500) {
+          throw new Error("server fall");
+        } else return response.json();
+      }).then((responseData) => {
+        authorInputElement.value = "";
+        textInputElement.value = "";
+        hideElement(addCommentLoader);
         getApi();
-  })
+        hideElement(addCommentLoader);
+        return;
+      }).catch((error) => {
+        console.log(error);
+        if (error.message === "< 2 sumb") {
+          alert("Имя и комментарий должны быть не короче 3 символов");
+          authorInputElement.classList.add("error");
+          textInputElement.classList.add("error");
+        } else if (error.message === "server fall") {
+          alert("Сервер сломался, попробуй позже");
+        } else return alert("Кажется, у Вас пропал Интернет, попробуйте позже!");
+        
+        hideElement(addCommentLoader);
+        showElement(formElement);
+      })
+      
 };
 
   const renderUsers = () => {
@@ -160,11 +209,11 @@
       //   likes: 0,
       //   isLiked: false
       // })
-      postApi();
+      postApi()
+      
     }
 
-    authorInputElement.value = "";
-    textInputElement.value = "";
+    
     
     isReplay = false;
   })
