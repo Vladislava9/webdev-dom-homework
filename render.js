@@ -47,5 +47,4 @@ export const renderUsers = ({ users }) => {
     listElement.innerHTML = usersHtml;
     addLike({users});
     newReply();
-    
   };
