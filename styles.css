@@ -148,3 +148,17 @@ body {
   .hidden {
     visibility: hidden;
   }
+
+  .error {
+    background-color: brown;
+  }
+
+  .quote {
+    margin-bottom: 32px;
+    padding: 15px 20px;
+    white-space: pre-line;
+    background: #d5d2d2;
+    font-size: 16px;
+    color: #000000;
+    border-radius: 5px;
+  }
