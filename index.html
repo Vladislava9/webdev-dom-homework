@@ -6,26 +6,15 @@
   <meta charset="utf-8" />
   <link rel="stylesheet" href="styles.css" />
 </head>
-
 <body>
-  <div class="container">
-    <div class="loader_1">
-      Подождите, комментарии загружаются...
-    </div>
-    <ul class="comments" id="commentsId">
-      <!--Список рендерится из js -->
-    </ul>
-    <div class="loader_2 hidden">Комментарий загружается...</div>
-    <div class="add-form hidden">
-      <input type="text" class="add-form-author" id="author-input" value="" placeholder="Введите ваше имя" />
-    <textarea type="textarea" class="add-form-text" id="text-input" value="" placeholder="Введите ваш коментарий"
-      rows="4"></textarea>
-    <div class="add-form-row">
-      <button class="add-form-button" id="add-form-buttonId">Написать</button>
-    </div>
-    </div>
-  </div>
+<div id="app" class="app"></div>
 </body>
 <script type="module" src="./main.js"></script>
 
 </html>
+
+
+<!-- 1. Вынести страницу в js 
+    2. Решить все ошибки;
+    3. Тернарный оператор, который будет показывать форму или сссылку (зависит от токена)
+    4. Форма логена (функция рендера) + логика работы setToken-->
