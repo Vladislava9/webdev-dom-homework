@@ -1,0 +1,16 @@
+{
+  "name": "webdev-dom-homework",
+  "version": "1.0.0",
+  "description": "https://glebkaf.github.io/webdev-dom-tohomework/",
+  "main": "main.js",
+  "scripts": {
+    "dev": "webpack --mode development --watch"
+  },
+  "author": "Vladislava",
+  "license": "ISC",
+  "devDependencies": {
+    "date-fns": "^2.30.0",
+    "webpack": "^5.88.2",
+    "webpack-cli": "^5.1.4"
+  }
+}
