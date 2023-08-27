@@ -3,6 +3,7 @@ import { token } from "./api.js";
 import { authorization } from "./loginPage.js"
 import { addLike, getLikeClass } from "./addEl.js";
 import { newReply } from "./newReply.js";
+import {format} from "date-fns";
 
 const appElement = document.getElementById("app");
 
@@ -11,7 +12,7 @@ export const renderApp = () => {
         return `<li class="comment">
               <div class="comment-header">
                 <div>${user.author.name}</div>
-                <div>${user.date}</div>
+                <div>${format(new Date(user.date), "yyyy-MM-dd hh.mm.ss")}</div>
               </div>
               <div class="comment-body">
                 <div class="comment-text">
